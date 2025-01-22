@@ -1,24 +1,27 @@
 #!/bin/bash
 
-# Detect OS
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # macOS
-    if ! command -v brew &> /dev/null; then
-        echo "Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    fi
-    brew install webp
-elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    # Linux
-    if command -v apt-get &> /dev/null; then
-        # Debian/Ubuntu
-        sudo apt-get update
-        sudo apt-get install -y webp
-    elif command -v yum &> /dev/null; then
-        # RedHat/CentOS
-        sudo yum install -y libwebp-tools
-    fi
+# Check if running on macOS
+if [[ "$OSTYPE" != "darwin"* ]]; then
+    echo "This script is for macOS only!"
+    exit 1
 fi
+
+# Check and install Xcode Command Line Tools if needed
+if ! xcode-select -p &>/dev/null; then
+    echo "Installing Xcode Command Line Tools..."
+    xcode-select --install
+    echo "Please wait for Xcode Command Line Tools installation to complete and press enter..."
+    read -r
+fi
+
+# Install Homebrew if needed
+if ! command -v brew &>/dev/null; then
+    echo "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+# Install webp tools
+brew install webp
 
 # Download and install the conversion script
 curl -O https://raw.githubusercontent.com/curenorway/webp-converter/main/webp.sh
